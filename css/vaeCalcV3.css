@@ -1,0 +1,154 @@
+/* Default styling for jQuery vae_ver_xx and index_Vxx */
+.vapRow1 {
+	background-color: LightGray;
+	color: #000;
+	font-family: Arial,Helvetica,Sans-serif;
+	font-size: 90%;
+}
+.vapRow2 {
+	background-color: Azure;
+	color: #000;
+	font-family: Arial,Helvetica,Sans-serif;
+	font-size: 90%;
+}
+
+.vapCondition{
+	text-align: left;
+}
+
+.vaeDay { 
+	 text-indent: -9999px; 
+	 background-color: #FF0000;
+
+}
+#bigDiv {
+	border:2px;
+	background:LightSkyBlue;
+	padding:20px;
+	width:550px;
+	display: inline-block;
+	text-align: center;
+	margin:20px;
+}
+#titleDiv {
+	width:500px;
+	text-align: center;
+
+}
+
+
+#msgid {
+	width:500px; 
+	text-align: left; 
+	font-family:Verdana, Geneva, sans-serif; 
+	font-size:12px;
+	background-color: Azure;
+	padding: 30px;
+	color: DarkSlateGray;
+	border: 1px solid Black;
+}
+#myFooter {
+	width:500px; 
+	text-align: left; 
+	font-family:Verdana, Geneva, sans-serif; 
+	font-size:12px;
+	background:#f2f1f1;
+	padding: 10px;
+	color: DarkSlateGray;
+	border: 1px solid Black;
+	padding:5px;
+	
+}
+
+#vapDiv {
+	background:LightGray; 
+	border:4px solid;  
+	border-color:Black; 
+	padding:5px; 
+	width:400px; 
+	position:absolute; 
+	top:50%; 
+	right:35%; 
+	display: none;
+
+}
+
+#table1, #table2 {
+	border:1px;
+	display: none;
+}
+
+
+#theTable {
+	border:1px solid Black;  
+	display: none;
+
+}
+
+th, td {
+	border:1px solid Black;  
+	border-collapse: collapse;
+
+}
+.emphesis {
+background-color: Yellow;
+font-size:14px;
+/*font-weight: bold; */
+text-decoration:underline;
+
+}
+#explainBox{
+ background:LightGray; 
+ border:2px solid;  
+ border-color:Black; 
+ padding:5px; 
+ width:400px; 
+ position:absolute; 
+ top:50%; 
+ right:35%; 
+ display: none; 
+ cursor: move;
+ }
+ 
+ #printBox {
+ background:LightGray; 
+ border:2px solid;  
+ border-color:Black; 
+ padding:5px;  
+ display: none; 
+ }
+ #buttonDiv, #buttonDivAtBottom {
+ margin:10px;
+ }
+ 
+ #closeWindow, #myPrint, #calcCondVAP, #calcVAP, #closeVapDiv {
+ background:grey; 
+ border:2px solid;
+ border-color:black; 
+ padding:5px;
+ margin-top:5px;
+ margin-bottom: 5px;
+ margin-right: 10px;
+ margin-left: 10px;
+ }
+ 
+ #genButton {
+	 background:White; 
+	 border:2px solid;  
+	 border-color:Red;
+	 display: none; 
+ }
+ #vapTitle {
+ 	text-align: left; 
+	font-family:Verdana, Geneva, sans-serif; 
+	font-size:14px;
+}
+#peepLegend {
+ 	text-align: left; 
+	font-family:Verdana, Geneva, sans-serif; 
+	font-size:10px;
+	display: none; 
+}
+
+ 
+ 

@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Ventilator-Associated Event (VAE) Calculator V 3.0</title>
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script> 
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+<link type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+
+
+<script type="text/javascript" src="js/vaeCalcV3.js"></script>
+<link type="text/css" href="css/vaeCalcV3.css" rel="stylesheet" />
+
+
+</head>
+<body style="background:darkgray;">
+ 
+
+<!--  ***********************
+HTML page for VAE Calculator.  
+Barry Rhodes, Ph.D. 
+Development Team Lead
+Division of Healthcare Quality Promotion 
+NCEZID, CDC 
+brhodes@cdc.gov
+
+
+Copyright 2014 Barry Rhodes
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ 
+
+Questions or comments should be directed to me at the address above.
+
+Barry
+
+
+************************** -->
+
+
+
+
+
+
+
+<!-- Want this div to "shrink wrap" it containing divs.  teh content is dynamic and the width and height changes with user input.  -->
+
+<div id="bigDiv">  
+
+<div id="titleDiv">
+<h1> Ventilator-Associated Event (VAE) Calculator Ver. 3.0</h1>
+</div> 
+
+
+
+
+<center>
+<div id="buttonDiv" style="display:none;" >
+<button class="calcVAC" title="Click this button to calculate the VAC.">Calculate VAC</button>
+<button class="reset" title="Click here to start over.">Start Over</button>
+<button id='IVAC' title='Click this button to move on the the IVAC calculator'>Go to IVAC</button>
+<button class='IVACCalc' title='Click this button to calcute IVAC'>Calculate IVAC</button>
+<button id='explain' title='Click this button for an explanation of the resoning'>Explain...</button>
+<button id='VAP' title='Click this button to move on to the VAP determination'>Go to VAP</button>
+</div>
+</center>
+<center>
+<p id="msgid"; >If this message does not disappear in a few seconds then you probably do not have JavaScript enabled on your browser.  
+This calculator requires JavaScript to run.  Depending on your browser settings, you may see a warning box at the top or bottom of the screen that says that this page is attempting to 
+run ActiveX code.  You should click to allow this page to run.
+</p>
+</center>
+
+<span id='workSpace';>
+
+
+
+<div id = 'datePickerDiv'; style=" text-align: center;"> Date: <input type="text" id="datePicker" > (mm/dd/yyyy)
+</div>
+
+<center>
+	<table id="theTable" border="1";  style="display: none;" >
+		<tr>
+		<th style="vertical-align:top;" ><span title='Days the patient was on mechanical ventilation.  Day 1 is the first day the patient was intubated.'>MV Day</span></th>
+		<th style="vertical-align:top;">Date</th>
+		<th class='peepHeader' style="vertical-align:top;"><button id='hidePeepCol' STYLE='font-family : monospace;  font size: 7pt; ' title='Click this button to hide PEEP values.'>Hide...</button> <span title='Positive End-Expiratory Pressure - Values typically  range from 0 to 15.'>Min. PEEP<br>(cmH<sub>2</sub>O)</span>
+		</th>
+		<th class='fio2Header' style="vertical-align:top;"><button id='hideFio2Col' STYLE='font-family : monospace;  font size: 7pt; ' title='Click this button to hide FiO2 values.'>Hide...</button>  <span title='Fraction of Inspired Oxygen'>Min. FiO<sub>2</sub><br>(30 - 100)</span>
+		</th>
+		<th class = 'vaeHeader' style='vertical-align:top;'><span title='If a ventilator associated event is determined, it will show up in this column.'>VAE&nbsp</span></th>
+	</tr>
+
+	</table>
+</center>
+
+
+<center>
+<table id="legendTable" style=" font-family:Verdana, Geneva, sans-serif; font-size:10px; display: none;">
+<td style="vertical-align:top; background:Transparent; ">Legend: </td>
+<td style="vertical-align:top; background:NavajoWhite; "> VAE Window </td>
+<td style="vertical-align:top; background:Khaki; "> VAE Date</td>
+<td style="vertical-align:top; background:LightGray; "> Qualifying Antimicrobial Day (QAD)</td>
+<!-- <td style="vertical-align:top; background:LightGray; ">VAE Window</td> -->
+<td style="vertical-align:top; background:Gray; "> Cumulative QAD </td>
+</table>
+</center>
+<p id='peepLegend'>* All values of PEEP less than 5 cmH<sub>2</sub>O are considered to be 5 cmH<sub>2</sub>O for purposes of the VAC definition.  So for PEEP values entered as less than or equal to 5 cmH<sub>2</sub>O, an increase in the daily minimum PEEP to at least 8 cmH<sub>2</sub>, sustained for 2 or more calendar days, is required to meet the VAC definition. 
+</p>
+
+
+<center>
+<div id="buttonDivAtBottom" style="display: none;" >
+<button class="calcVAC" title="Click this button to calculate the VAC.">Calculate VAC</button>
+<button class="reset" title="Click here to start over.">Start Over</button>
+</div>
+</center>
+
+</span>
+
+
+<p>
+<center>
+<button id="myPrint" title="printScreen">Print</button> 
+<button id="closeWindow" title="Close Window" onclick="self.close();" >Close</button>
+</center>
+</p>
+</div> <!-- End bigDiv -->
+
+
+
+
+
+<div id='explainBox'>
+<button class="closeExplainBox"  title="Close" style=" background:White; border:1px solid;  border-color:Red; float:right;">X</button>
+<p id='msg'; style="color:#585858; font-family:Verdana, Geneva, sans-serif; font-size:12px;">Message Box Error! </p>
+ <center>
+<button class="closeExplainBox"  title="Close It" style=" background:White; border:2px solid;  border-color:Red; ">OK</button><br>
+<p style="color:#585858; font-family:Verdana, Geneva, sans-serif; font-size:10px;">(Hint: this box is movable by dragging with your mouse.  If you move it to one side and leave it open, the explanation will automatically update itself as things change.)
+</p> 
+</center>
+</div>
+
+
+ <div id='printBox'>
+ </div>
+
+
+<div id='vapDiv'>
+
+<p id='vapTitle'>   </p>
+
+<!-- Primary table for VAP determination -->	
+<table id='table1'; border='1';  >
+	<tr>
+		<th>Question</th>
+		<th> Yes/No</th>
+	</tr>	 
+	<tr class = 'vapRow1'>
+		<td class = 'pvapCondition'> 
+			Criterion #1: Positive culture of one of the following specimens, meeting quantitative or semi-quantitative thresholds as outlined in protocol, <bold>without</bold> requirement for purulent respiratory secretions:
+			<ul>
+				<li>Endotracheal aspirate</li>
+				<li>Bronchoalveolar lavage</li>
+				<li>Lung tissue</li>
+				<li>Protected specimen brush</li>
+			</ul>
+		</td>
+		<td class = 'pVap' id='purulentInput'; align='center'><input type='checkbox' class='cb2' tabindex=1 />
+	</tr>
+	<tr> <td style="text-align: center" colspan="2">OR</td></tr>
+	<tr class='vapRow1'>
+		<td class = 'pvapCondition';>
+			Criterion #2: Purulent respiratory secretions (defined in the protocol) plus a positive culture of one of the following specimens (qualitative culture, or quantitative&#47;semi-quantitative culture without sufficient growth to meet criterion #1):
+			<ul>
+				<li>Sputum</li>
+				<li>Endotracheal aspirate</li>
+				<li>Bronchoalveolar lavage</li>
+				<li>Lung tissue</li>
+				<li>Protected specimen brush</li>
+			</ul>
+		</td>
+		<td class = 'pVap'; align='center'><input type='checkbox' class='cb2' tabindex=1 />
+	</tr>
+	<tr> <td colspan="2" style="text-align: center" >OR</td></tr>
+	<tr class='vapRow1'>
+		<td class = 'pvapCondition';>
+			Criterion #3: One of the following positive tests(as outlined in the protocol):			
+			<ul>
+				<li>Pleural fluid culture</li>
+				<li>Lung histopathology</li>
+				<li>Diagnostic test for <i>Legionella</i> species</li>
+				<li>Diagnostic test for selected viral pathogens</li>
+			</ul>
+		</td>
+		<td class = 'pVap'; align='center'><input type='checkbox' class='cb2' tabindex=1 />
+	</tr>
+	
+
+</table>
+
+<br>	
+<center>	
+<button id='calcVAP' title='Click this button to calculate Possible VAP.'>Calculate PVAP</button>
+
+<br>
+</center>
+
+</div>
+
+</body>
+</html>
