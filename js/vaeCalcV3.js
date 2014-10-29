@@ -42,7 +42,7 @@ Change Log:
 04/10/2013 .live method is deprecated in jQuery 1.9 so chaged it to .on
 04/15/2013 calculates multiple VAEs in one episode of care
 04/16/2013 added print functionality
-05/07/2013 fixed resetVAcDaylabel to reset when IVAC is clicked a second time and the VAE evernt reverts back to VAC
+05/07/2013 fixed resetVAcDaylabel to reset when IVAC is clicked a second time and the VAE event reverts back to VAC
 05/15/2013 allow user to change values after clicking a calculate X button.  if a change is made after calculating a VAE
 			then the determination will rever back to the previous type and allow the user to recalculate.
 07/15/2013 changed >14 to >= 14 day rule
@@ -50,14 +50,14 @@ Change Log:
 12/18/2013 changed the vaeEvents object to include vacDeterminedBy, changed the vac explanations to be more detailed
 02/20/2014 fixed a bug when both FIO2 and PEEP values meet the VAC criteria on the same day.  It was counting this as two events when it should only be one.
 10/7/2014 Added a new drug as per the Jan 2015 release of NHSN
-10/7/2014 Major changes to probable and possible VAP which converged into a single PVAP as per the 2015 changes to the VAE protocol
+10/7/2014 Major changes to probable and possible PVAP which converged into a single PVAP as per the 2015 changes to the VAE protocol
 
 *******************************************
 
 
 
 *****************************************************************************************************************/
-//Some Gloabal vars and objects 
+//Some Global vars and objects 
 	var IVACCols = false;  //flag for whether the IVAC columns are being shown or not
 	var vacDay = 0;  //deprecated      // global var that stores the day of the VAC.  This index starts at 1 and increments from there
 	var vacDays = [];  //this stores an array of indexes of vacDays
@@ -68,7 +68,7 @@ Change Log:
 		this.types=types;  //array values are VAC, ICAC ProbVAP PossVAP
 		this.windowStartDay = windowStartDay;
 		this.windowStopDay = windowStopDay;
-		this.hasVAPBeenDetermined = hasVAPBeenDetermined;  //array of bools that tell whether a VAP has been determined
+		this.hasVAPBeenDetermined = hasVAPBeenDetermined;  //array of bools that tell whether a PVAP has been determined
 		this.vacDeterminedBy = vacDeterminedBy;  // values are PEEP or FiO2
 	}
 	
@@ -112,7 +112,7 @@ Change Log:
 //Main entry into jQuery allows calls only after the page has fully loaded
 
 $(document).ready(function(){
-//All the elements are intially hidden in the css.  This is so that if a user does not have js on, then the browser will not show the elements
+//All the elements are initially hidden in the css.  This is so that if a user does not have js on, then the browser will not show the elements
 //As long as js is turned on, then the script will show them as needed
 
 	$('#buttonDiv').show();
@@ -121,8 +121,10 @@ $(document).ready(function(){
 	$('.IVACCalc').hide();
 	//$('#addDrugCol').hide();
 	$('#theTable').hide();
-	$('#VAP').hide();
-	$('#calcVAP').hide();
+	$('#PVAP').hide();
+	$('#calcPVAP').hide();
+	$("#nextIVAC").hide();
+	$('#cancelPVAP').hide();
 	$('.reset').hide();
 	//dont show these buttons yet.  Only allow to be shown after a VAC determination is made
 
@@ -143,9 +145,32 @@ $(document).ready(function(){
 	//set the footer width to the bigDiv width
 	$("#footer").width($("#bigDiv").width() + 44);
 	
-	
 	direction = "<p>Welcome to version 3.0 of the Ventilator-Associated Event Calculator. Version 3.0 operates based \
-	upon the currently posted (201X) VAE protocol. The list of eligible antimicrobial agents for use\
+	upon the currently posted (January 2015) VAE protocol.  For periods of time where \
+	a patient is on APRV or a related type of mechanical ventilation for a full calendar day, a daily minimum \
+	PEEP value should not be entered into the calculator.  Additionally the calculator finds multiple VAEs per patient as long as they \
+	conform to the 14 day rule. It is strongly encouraged that you read and study the VAE protocol found \
+	<a href='http://www.cdc.gov/nhsn/acute-care-hospital/vae/index.html' target='_blank'>here</a>.</p> \
+	<p>To get started, enter a date below that corresponds to the first day the patient was placed on mechanical  \
+	ventilation during the mechanical ventilation episode of interest. You may type in a date or use the popup \
+	calendar when it appears. You may only enter dates within the past year. If the patient has been on mechanical \
+	ventilation for more than one year during the current mechnaical ventilation episode, choose a start date \
+	that is more recent but is at least 7 days before the period of interest.";
+	
+	
+	
+	direction += "<span id='more';  style='color:blue;'> more...</span> <p id='moreText' style='display: none;'> \
+	The calculator runs locally on your machine so no data are reported anywhere. Feel free to enter \
+	or change as much data as you like. If you don't understand something there are several mechanisms for getting \
+	help. Most of the buttons and table headings will give an expanded description if you hover your mouse over the \
+	item in question. Also the explain button will pop up an explanation of the reasoning behind the calculator. The\
+	explanation box is movable as are all the popup windows. That allows you to open one up and drag it to the side\
+	as you work. The explanation will automatically update itself as you work through the protocol.</p>\
+	<span id='less';  style='color:blue;'> less...</span> ";
+	
+	/********
+	direction = "<p>Welcome to version 3.0 of the Ventilator-Associated Event Calculator. Version 3.0 operates based \
+	upon the currently posted (January 2015) VAE protocol. The list of eligible antimicrobial agents for use\
 	in meeting the IVAC definition has been refined.   As a reminder, the calculator recognizes PEEP values &le; 5\
 	and corrects entries according to the VAE protocol prior to making a VAC determination. For periods of time where \
 	a patient is on APRV or a related type of mechanical ventilation for a full calendar day, a daily minimum \
@@ -161,7 +186,7 @@ $(document).ready(function(){
 	explanation box is movable as are all the popup windows. That allows you to open one up and drag it to the side\
 	as you work. The explanation will automatically update itself as you work through the protocol.</p>\
 	<span id='less';  style='color:blue;'> less...</span> ";
-	
+	 *********/
 	
 	showDirection();
 	$('#less').hide();
@@ -186,7 +211,7 @@ function() {
 	
 $('#more').click(function(){
 	$('#more').hide();
-	$('#moreText').css('font-weight', 'bold' );
+	//$('#moreText').css('font-weight', 'bold' );
 	$('#moreText').show();
 	$('#less').show();
 	
@@ -213,9 +238,9 @@ $(document).on("click", '#addDrugCol',  function() {
 	hasIVACbeenCalculated = false;
 });
 
-$('#VAP').click(function() {
+$('#PVAP').click(function() {
 	setVAPDirection();
-	showVapPage(0);
+	showPVAPPage();
 	initializeVaeVapFlags();
 	explanation = "<h3>Explanation:</h3>";
 
@@ -256,18 +281,31 @@ $('.closeExplainBox').click(function() {
 	$('#explainBox').hide();
 });
 
-$(document).on("click", '.cb',  function() { 	//the following event handler for all checkboxes is solely for printing purposes only
-	if($(this).is(':checked') ) $(this).attr('checked', 'checked'); 				//IE will not print checkboxes unless their attreibutes are set to "checked"
+$(document).on("click", '.cb',  function() { 	//the following event handler for all check boxes is solely for printing purposes only
+	if($(this).is(':checked') ) $(this).attr('checked', 'checked'); 				//IE will not print check boxes unless their attributes are set to "checked"
 	else $(this).removeAttr('checked');
 });
-$(document).on("click", '.cb2',  function() { 	//the following event handler for all checkboxes is solely for printing purposes only
-	if($(this).is(':checked') ) $(this).attr('checked', 'checked'); 				//IE will not print checkboxes unless their attreibutes are set to "checked"
+$(document).on("click", '.cb2',  function() { 	//the following event handler for all check boxes is solely for printing purposes only
+	if($(this).is(':checked') ) $(this).attr('checked', 'checked'); 				//IE will not print check boxes unless their attributes are set to "checked"
 	else $(this).removeAttr('checked');
 });
 
-$('#calcVAP').click(function() {
-	calcVAP();
+$('#calcPVAP').click(function() {
 
+	
+	if( !calcPVAP() ) myAlert("Based on your response, this episode should be characterized as an IVAC");
+	else $("#pvapBody").html("PVAP Found!");
+
+});
+
+$('#nextIVAC').click(function() {
+	 if( !showPVAPPage() ) $('#PVAP').attr('disabled', 'disabled');
+});
+
+
+$('#cancelPVAP').click(function() {
+	$("#vapDiv").hide();
+	//alert("hiding");
 });
 
 //Event handler for the "IVAC" button	
@@ -293,7 +331,7 @@ $('.calcVAC').click(function() {
 	
 }); 	
 
-//these two functions trigger on a change but only after the element looses focus which produces inconsistent behavior
+//these two functions trigger on a change but only after the element looses focus which produces inconsistent behaviour
 
 //if a user calculates a vac and then makes a change to FIO2 or PEEP values this will restrict the user
 //to recalculate the VAC before proceeding
@@ -330,10 +368,10 @@ function resetIVAC() {
 	for(var i = 0; i < vae.types.length; i++) {
 		vae.types[i] = "VAC";
 	}
-	$('#VAP').hide();
+	$('#PVAP').hide();
 	resetVacDayLabel();
 	clearQADCol();
-	$('.IVACCalc').show();  //handles the case where a VAP was calculated and this was hidden
+	$('.IVACCalc').show();  //handles the case where a PVAP was calculated and this was hidden
 	
 	direction = explanation = "You have changed an input value after clicking on the Calculate IVAC button.  When you are finished making your changes, please recalculate IVAC.";
 	alert(direction);  //this may be too annoying
@@ -460,6 +498,7 @@ $('#datePicker').datepicker({
 			{
 				myAlert("You have chosen more than a year's worth of data.  This may cause your system to run slowly or shut down.  Choose a �start date� that is more recent, but is at least 7 days before the period of interest.");
 				return false;
+				
 			}
 			
 			
@@ -512,7 +551,7 @@ $('#datePicker').datepicker({
 			$('#datePickerDiv').remove();	
 			
 			
-			direction = "Now enter PEEP and/or FiO<sub>2</sub>  values and when done, click the  &#34;Calculate VAC&#34; button. <span class='emphesis'>You do not need to enter data for every day.</span>  Concentrate on the dates where you believe a Ventilator-Associated Event may be likely. If your values meet the Ventilator-Associated Condition (VAC) definition, the event day will be identified and the VAE Window will be defined.  ";
+			direction = "Now enter PEEP and/or FiO<sub>2</sub>  values and when done, click the  &#34;Calculate VAC&#34; button. <span class='emphasis'>You do not need to enter data for every day.</span>  Concentrate on the dates where you believe a Ventilator-Associated Event may be likely. If your values meet the Ventilator-Associated Condition (VAC) definition, the event day will be identified and the VAE Window will be defined.  ";
 
 			showDirection();
 			
@@ -549,8 +588,8 @@ function addIVACCols()
 	IVACCols = true;
 	direction = "Now that a VAC determination has been made, enter yes (check) or no (leave box unchecked) if the patient \
 	has had a temperature  &gt; 38&deg C or &lt; 36&deg C or a WBC &#x2265; 12,000 cells/mm<sup>3</sup> or &#x2264; 4,000 cells/mm<sup>3</sup> within the VAE Window Period.  \
-	 Choose a drug from the drop down list and <span class='emphesis'>check all the corresponding days shown on the screen</span> that the agent was administered.  If more than one drug was given over the course of treatment, \
-	click on the &quot;Add...&quot; button in the drug column header and do the same.  Once all data have been entered, <span class='emphesis'>click the &#34;Calculate IVAC&#34; button.</span>";
+	 Choose a drug from the drop down list and <span class='emphasis'>check all the corresponding days shown on the screen</span> that the agent was administered.  If more than one drug was given over the course of treatment, \
+	click on the &quot;Add...&quot; button in the drug column header and do the same.  Once all data have been entered, <span class='emphasis'>click the &#34;Calculate IVAC&#34; button.</span>";
 	explanation = "Please enter data and click the &#34;Calculate IVAC&#34; button.";
 	showDirection();
 
@@ -748,7 +787,7 @@ function addDrugColumn()
 	reshadeVAEWindow();
 	resetVacDayLabel();
 
-	$('#VAP').hide();
+	$('#PVAP').hide();
 	
 
 
@@ -797,7 +836,7 @@ function removeDrugColumn(col)
 	explanation = "A drug column has been removed.  An new explanation will be determined after you click on &quot;Calculate IVAC&quot; again.   ";
 	showDirection();
 	updateMyAlert(explanation);
-	$('#VAP').hide();
+	$('#PVAP').hide();
 	adjustBigDivWidth();
 
 }
@@ -882,14 +921,14 @@ function calcIVAC() {
 
 	}
 	if(foundAtLeastOneIVAC) {
-		$('#VAP').show();  //show the VAP button now
-		if(foundAtLeastOneIVAC == 1) direction += '<p>An IVAC was found for this patient.  Click on the &quot;Go To VAP&quot; button to go to the next part of the definition or click on the &quot;Explain...&quot; button for an explanation of how this determination was made.</p>';
+		$('#PVAP').show();  //show the VAP button now
+		if(foundAtLeastOneIVAC == 1) direction += '<p>An IVAC was found for this patient.  Click on the &quot;Go To PVAP&quot; button to go to the next part of the definition or click on the &quot;Explain...&quot; button for an explanation of how this determination was made.</p>';
 		//bug here vae.types.length gives all vaes and this should be only IVACs
 		var c = getNumberOfIVACs();
-		if(foundAtLeastOneIVAC > 1)  direction += '<p>' +  c.toString() + ' IVACs were found for this patient.  Click on the &quot;Go To VAP&quot; button to go to the next part of the definition or click on the &quot;Explain...&quot; button for an explanation of how this determination was made.</p>';
+		if(foundAtLeastOneIVAC > 1)  direction += '<p>' +  c.toString() + ' IVACs were found for this patient.  Click on the &quot;Go To PVAP&quot; button to go to the next part of the definition or click on the &quot;Explain...&quot; button for an explanation of how this determination was made.</p>';
 	}
 	else {
-			$('#VAP').hide();
+			$('#PVAP').hide();
 			if(vae.types.length == 1) direction += '<p>No IVACs were found for this patient.  You should report the event as a VAC. Click on the &quot;Explain...&quot; button for an explanation of how this determination was made.</p>';
 			else direction += '<p>No IVACs were found for this patient.  You should report all the events as a VACs.  Click on the &quot;Explain...&quot; button for an explanation of how these determinations were made.</p>';
 	}
@@ -1326,7 +1365,7 @@ function calcVAC()
 	if(vae.eventDays.length) {
 		//explanation = "<br>" + direction + "<br>" +  explanation;
 		//alert(explanation);
-		direction += "<br><span class='emphesis'>Click on the Go To IVAC button</span> to move to the next part of the protocol or click on the &#34Explain&#34 button to see how this determination was made. ";
+		direction += "<br><span class='emphasis'>Click on the Go To IVAC button</span> to move to the next part of the protocol or click on the &#34Explain&#34 button to see how this determination was made. ";
 		
 		return true;
 	}
@@ -1555,83 +1594,95 @@ function getMVDate(day) {
 		vae.vacDeterminedBy = [];
 	}
 
-/********************** Start of VAP functionality *******************************/
-function calcVAP() {
+/********************** Start of PVAP functionality *******************************/
+function calcPVAP() {
 	
-	var done = false;
+	var checked = false;
 	var str = "";
 	var i = 0;
-	var row = "";
-	var instruction = '';
-	direction = '';
-	explanation += LINE;
+	direction = 'No check boxes were checked. Therefore this event should be reported as an IVAC.  ';
+	explanation += 'No check boxes were checked. Therefore this event should be reported as an IVAC.  ' + LINE;
 
 	
 	
-	var r = getVAPCandidate();
-	if(!r.foundOne) return false;
+	var r = getPVAPCandidate();
+	if(!r.foundOne) {
+		$('#PVAP').attr('disabled', 'disabled');  //should be done so disable any more PVAP pages from showing
+		return false;
+	}
 	
 	var thisVapCandidate = r.index;
 	var ivacDate =  getMVDate(vae.eventDays[thisVapCandidate]);
+	
+	updateMyAlert(explanation);
 
 	
 	
 	$('.pVap').each( function(index, object) {
-
-		if( $(this).children().is(':checked') )
-		{
-			row = index+1;
-			alert("row " + row + " was checked");
-			direction = "The event on <span class = 'emphesis'>" + ivacDate + "</span> conforms to a <span class='emphesis'>Probable Ventilator-Associated Pneumonia </span> definition and should be reported as such.  For a discussion of why, see/click on the Explain button. ";
-			explanation += "<br>For the event on <span class = 'emphesis'>" + ivacDate + "</span> you checked criterion: " + row + ". This is sufficient to define a Probable Ventilator-Associated Pneumonia. ";
-			$('#vapTitle').html(direction);
-			updateMyAlert(explanation);
-			//$('#vapDiv').hide();
-			vae.types[thisVapCandidate] = 'PVAP';
-			vae.hasVAPBeenDetermined[thisVapCandidate] = true;
-			resetVacDayLabel();
+		//loop through each of the PVAP check boxes 
+		if( $(this).children().is(':checked') )  {
+			checked = true;
 		}
-		
-	});	
-	if(done) {
-		direction = "The event on <span class = 'emphesis'>" + ivacDate + "</span> conforms to a <span class='emphesis'>Probable Ventilator-Associated Pneumonia </span> definition and should be reported as such.  For a discussion of why, see/click on the Explain button. ";
-		$('#vapTitle').html(direction);
-		updateMyAlert(explanation);
+	});		
+		//alert("row " + row + " was checked");
+	if(checked) {		
+		direction = "<p>The event on " + ivacDate + " conforms to a Possible Ventilator-Associated Pneumonia (PVAP) definition.  For a discussion of why, click on the Explain button. </p>";
+		explanation = "<p>Clicking &quot;Yes&quot; to any of the three conditions is sufficient to meet the definition of a Possible Ventilator-Associated Pneumonia (PVAP) for the event on " + ivacDate + ". </p>";
 		//$('#vapDiv').hide();
-		vae.types[thisVapCandidate] = 'Probable VAP';
-		vae.hasVAPBeenDetermined[thisVapCandidate] = true;
+		vae.types[thisVapCandidate] = 'PVAP';
+		
 		resetVacDayLabel();
-			
 	}
-	else { //if not done
-			explanation += "<br>The event on <span class = 'emphesis'>" + ivacDate + "</span>, no Boxes are checked.  Therefore this case should be reported as an IVAC. ";
-			//$('#vapTitle').html(direction);
-			updateMyAlert(explanation);
-			vae.hasVAPBeenDetermined[thisVapCandidate] = true;
+	else {
+			explanation += "<p>The event on <span class = 'emphasis'>" + ivacDate + "</span>, no Boxes are checked.  Therefore this case should be reported as an IVAC. </p>";
+			direction += "<p>The event on " + ivacDate + "conforms to the IVAC definition only.  </p>";
+		}
+	
 
+	//regardless the PVAP has been tested. therefore
+	vae.hasVAPBeenDetermined[thisVapCandidate] = true;
+	
+	
+	$('#table1').hide();
+
+	
+	//now are there any more IVACs for this patient?
+	r = getPVAPCandidate();
+	if(r.foundOne)  {
+		//there are more so show instructions and a next button
+			direction += "<p>Click on the &quot;Next&quot;button below to go to the next IVAC candidate";
+			showDirection();
+			$("#nextIVAC").show();
+			$('#calcPVAP').hide();
+			$('#cancelPVAP').hide();
 	}
-	showDirection()
+	else {   //there are no more candidates
+		$('#calcPVAP').hide();
+		$("#nextIVAC").hide();
+		$('#cancelPVAP').show();
+	}
+	
+	
 	$('#vapTitle').html(direction);
+	updateMyAlert(explanation);
+	showDirection();
+	return true;
 	
-	var r = getVAPCandidate();
-	
-	if(r.foundOne) {
-		$('#table2').hide();
-		showVapPage(r.index);
-	}
-	else $('#vapDiv').hide();
-	
-
 
 }
 
 
 
-function showVapPage(vapCandidateIndex) {
+function showPVAPPage(vapCandidateIndex) {
 
 	
-	var r = getVAPCandidate();
+	var r = getPVAPCandidate();
+	//are there any IVACs that have not been checked out for PVAP
 	if(!r.foundOne) return false;
+	
+	//make sure the checkboxes are unchecked
+	
+	$(".cb2").attr('checked', false); // Unchecks it
 	
 	 vapCandidateIndex = r.index;
 	
@@ -1643,7 +1694,8 @@ function showVapPage(vapCandidateIndex) {
 	var windowStartDate =  getMVDate(vae.windowStartDay[vapCandidateIndex]);
 	var windowStopDate = getMVDate(vae.windowStopDay[vapCandidateIndex]);
 			
-	instructions += "<h2>PVAP</h2>For the IVAC on <span class='emphesis'>" + ivacDate + "</span>, did the patient experience any  any of the criteria below within the VAE window " + windowStartDate + " to " + windowStopDate + ".  ";
+	instructions += "<center><h3>PVAP Determination</h3></center>For the IVAC on <span class='emphasis'>" + ivacDate + "</span>, did the patient have documentation of any of the following findings during the VAE Window: " + windowStartDate + " to " + windowStopDate + ".  ";
+
 
 	var bigDivTop =  	$('#bigDiv').offset().top;
 	var bigDivLeft = 	$('#bigDiv').offset().left;
@@ -1662,24 +1714,25 @@ function showVapPage(vapCandidateIndex) {
 	
 	$('#vapDiv').show();
 	$('#vapTitle').html(instructions);
+	$("#nextIVAC").hide();
 	$('#table1').show();
 
 	$('.probVapAbs > input ').attr("checked", false); 
 	$('.possVap > input ').attr("checked", false); 
 
 	//configure the buttons...	
-	$('#calcVAP').show();
-	$('#VAP').hide();
+	$('#calcPVAP').show();
+	//$('#cancelPVAP').show();
 	$('.IVACCalc').hide();
 
-	
+	return true;
 
 
 }
 
 
 
-function getVAPCandidate() {
+function getPVAPCandidate() {
 	var ret = new retObj(0, false);  //a global object of event days and types	
 
 	for(var i = 0; i < vae.types.length; i++) {
@@ -1707,13 +1760,13 @@ function countVAPCandidates() {
 	
 function setVAPDirection() {
 	var c = countVAPCandidates();
-	if(c <= 1) 	direction = 'Now that an IVAC determination has been made, click the checkbox if the patient experienced any of the listed conditions within the VAE Window (shaded area). Then click on the &quot;Calculate VAP&quot; button. ';
-	else 		direction = 'This patient has ' + c + ' IVACs. A series of boxes will open up for each IVAC.  Click the checkbox if the patient experienced any of the listed conditions within the VAE Window (shaded area) for that IVAC. The table heading will indicate to which IVAC the questions refer. Then click on the &quot;Calculate VAP&quot; button';
+	if(c <= 1) 	direction = 'Now that an IVAC determination has been made, click the checkbox if the patient experienced any of the listed conditions within the VAE Window (shaded area). Then click on the &quot;Calculate PVAP&quot; button. ';
+	else 		direction = 'This patient has ' + c + ' IVACs. A series of boxes will open up for each IVAC.  Click the checkbox if the patient experienced any of the listed conditions within the VAE Window (shaded area) for that IVAC. The table heading will indicate to which IVAC the questions refer. Then click on the &quot;Calculate PVAP&quot; button';
 	showDirection();
 
 }	
 
-/********************** End of VAP functionality *******************************/
+/********************** End of PVAP functionality *******************************/
 	
 });	// end of ready function	
  

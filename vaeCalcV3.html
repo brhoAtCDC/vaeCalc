@@ -53,7 +53,7 @@ Barry
 
 
 
-<!-- Want this div to "shrink wrap" it containing divs.  teh content is dynamic and the width and height changes with user input.  -->
+<!-- Want this div to "shrink wrap" it containing divs.  The content is dynamic and the width and height changes with user input.  -->
 
 <div id="bigDiv">  
 
@@ -71,7 +71,7 @@ Barry
 <button id='IVAC' title='Click this button to move on the the IVAC calculator'>Go to IVAC</button>
 <button class='IVACCalc' title='Click this button to calcute IVAC'>Calculate IVAC</button>
 <button id='explain' title='Click this button for an explanation of the resoning'>Explain...</button>
-<button id='VAP' title='Click this button to move on to the VAP determination'>Go to VAP</button>
+<button id='PVAP' title='Click this button to move on to the PVAP determination'>Go to PVAP</button>
 </div>
 </center>
 <center>
@@ -85,7 +85,7 @@ run ActiveX code.  You should click to allow this page to run.
 
 
 
-<div id = 'datePickerDiv'; style=" text-align: center;"> Date: <input type="text" id="datePicker" > (mm/dd/yyyy)
+<div id = 'datePickerDiv'; style=" text-align: center;"> Mechanical Ventilation Start Date: <input type="text" id="datePicker" > (mm/dd/yyyy)
 </div>
 
 <center>
@@ -158,16 +158,16 @@ run ActiveX code.  You should click to allow this page to run.
 <div id='vapDiv'>
 
 <p id='vapTitle'>   </p>
-
+<p id = "vapBody">
 <!-- Primary table for VAP determination -->	
 <table id='table1'; border='1';  >
 	<tr>
 		<th>Question</th>
-		<th> Yes/No</th>
+		<th> Yes</th>
 	</tr>	 
 	<tr class = 'vapRow1'>
 		<td class = 'pvapCondition'> 
-			Criterion #1: Positive culture of one of the following specimens, meeting quantitative or semi-quantitative thresholds as outlined in protocol, <bold>without</bold> requirement for purulent respiratory secretions:
+			Positive culture of one of the following meeting quantitative or semi-quantitative thresholds as defined in the VAE protocol 
 			<ul>
 				<li>Endotracheal aspirate</li>
 				<li>Bronchoalveolar lavage</li>
@@ -180,7 +180,7 @@ run ActiveX code.  You should click to allow this page to run.
 	<tr> <td style="text-align: center" colspan="2">OR</td></tr>
 	<tr class='vapRow1'>
 		<td class = 'pvapCondition';>
-			Criterion #2: Purulent respiratory secretions (defined in the protocol) plus a positive culture of one of the following specimens (qualitative culture, or quantitative&#47;semi-quantitative culture without sufficient growth to meet criterion #1):
+			Positive culture of one of the following (qualitative or quantitative/semi-quantitative culture without sufficient growth to meet criterion #1) 
 			<ul>
 				<li>Sputum</li>
 				<li>Endotracheal aspirate</li>
@@ -188,13 +188,14 @@ run ActiveX code.  You should click to allow this page to run.
 				<li>Lung tissue</li>
 				<li>Protected specimen brush</li>
 			</ul>
+			<bold>AND</bold><p>Evidence of purulent respiratory secretions as defined in the VAE protocol.</p> 
 		</td>
 		<td class = 'pVap'; align='center'><input type='checkbox' class='cb2' tabindex=1 />
 	</tr>
 	<tr> <td colspan="2" style="text-align: center" >OR</td></tr>
 	<tr class='vapRow1'>
 		<td class = 'pvapCondition';>
-			Criterion #3: One of the following positive tests(as outlined in the protocol):			
+			One of the following positive tests (as outlined in the protocol):		
 			<ul>
 				<li>Pleural fluid culture</li>
 				<li>Lung histopathology</li>
@@ -210,10 +211,13 @@ run ActiveX code.  You should click to allow this page to run.
 
 <br>	
 <center>	
-<button id='calcVAP' title='Click this button to calculate Possible VAP.'>Calculate PVAP</button>
+<button id='calcPVAP' title='Click this button to calculate Possible VAP.'>Calculate PVAP</button>
+<button id='nextIVAC' title='Next IVAC Candidate'>Next</button>
+<button id='cancelPVAP' title='Cancel'>Close</button> 
 
 <br>
 </center>
+</p>
 
 </div>
 
