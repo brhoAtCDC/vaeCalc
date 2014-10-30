@@ -1616,25 +1616,45 @@ function calcPVAP() {
 	
 	updateMyAlert(explanation);
 
+	var rowsChecked = "";
 	
 	
+	// note Criterion is singular  Criteria is plural
 	$('.pVap').each( function(index, object) {
 		//loop through each of the PVAP check boxes 
 		if( $(this).children().is(':checked') )  {
 			checked = true;
+			
+				if(index == 0) rowsChecked = "Criterion 1 is checked.  ";
+				if (index == 1) {
+					if(rowsChecked) rowsChecked = rowsChecked.replace("Criterion 1 is", "Criteria 1 and 2 are");
+					else rowsChecked = "Criterion 2 is checked. ";
+				}
+
+				if (index == 2) {
+					if(rowsChecked) {
+						
+						rowsChecked = rowsChecked.replace("Criterion 1 is", "Criteria 1 and 3 are");
+						rowsChecked = rowsChecked.replace("1 and 2 are", "1, 2 and 3 are");
+						rowsChecked = rowsChecked.replace("Criterion 2 is", "Criteria 2 and 3 are");
+					}
+					else rowsChecked = "Criterion 3 is checked. "
+				}
+			
+			
 		}
 	});		
 		//alert("row " + row + " was checked");
 	if(checked) {		
 		direction = "<p>The event on " + ivacDate + " conforms to a Possible Ventilator-Associated Pneumonia (PVAP) definition.  For a discussion of why, click on the Explain button. </p>";
-		explanation = "<p>Clicking &quot;Yes&quot; to any of the three conditions is sufficient to meet the definition of a Possible Ventilator-Associated Pneumonia (PVAP) for the event on " + ivacDate + ". </p>";
+		explanation = "<p>" + rowsChecked + " Clicking &quot;Yes&quot; to any of the three criteria is sufficient to meet the definition of a Possible Ventilator-Associated Pneumonia (PVAP) for the event on " + ivacDate + ". </p>";
 		//$('#vapDiv').hide();
 		vae.types[thisVapCandidate] = 'PVAP';
 		
 		resetVacDayLabel();
 	}
 	else {
-			explanation += "<p>The event on <span class = 'emphasis'>" + ivacDate + "</span>, no Boxes are checked.  Therefore this case should be reported as an IVAC. </p>";
+			explanation += "<p>For the event on <span class = 'emphasis'>" + ivacDate + "</span>, no Boxes are checked.  Therefore this case should be reported as an IVAC. </p>";
 			direction += "<p>The event on " + ivacDate + "conforms to the IVAC definition only.  </p>";
 		}
 	
@@ -1694,7 +1714,7 @@ function showPVAPPage(vapCandidateIndex) {
 	var windowStartDate =  getMVDate(vae.windowStartDay[vapCandidateIndex]);
 	var windowStopDate = getMVDate(vae.windowStopDay[vapCandidateIndex]);
 			
-	instructions += "<center><h3>PVAP Determination</h3></center>For the IVAC on <span class='emphasis'>" + ivacDate + "</span>, did the patient have documentation of any of the following findings during the VAE Window: " + windowStartDate + " to " + windowStopDate + ".  ";
+	instructions += "<center><h3>PVAP Determination</h3></center>For the IVAC on <span class='emphasis'>" + ivacDate + "</span>, did the patient have documentation of any of the following findings during the VAE Window: <span class='emphasis'>" + windowStartDate + " to " + windowStopDate + "</span>.  ";
 
 
 	var bigDivTop =  	$('#bigDiv').offset().top;
