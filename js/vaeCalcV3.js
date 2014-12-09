@@ -145,12 +145,14 @@ $(document).ready(function(){
 	//set the footer width to the bigDiv width
 	$("#footer").width($("#bigDiv").width() + 44);
 	
-	direction = "<p>Welcome to version 3.0 of the Ventilator-Associated Event Calculator. Version 3.0 operates based \
-	upon the currently posted (January 2015) VAE protocol.  For periods of time where \
-	a patient is on APRV or a related type of mechanical ventilation for a full calendar day, a daily minimum \
-	PEEP value should not be entered into the calculator.  Additionally the calculator finds multiple VAEs per patient as long as they \
-	conform to the 14 day rule. It is strongly encouraged that you read and study the VAE protocol found \
-	<a href='http://www.cdc.gov/nhsn/acute-care-hospital/vae/index.html' target='_blank'>here</a>.</p> \
+	direction = "<p>Welcome to the Ventilator-Associated Event Calculator. Version 3.0 operates based \
+	upon the currently posted (January 2015) VAE protocol. It is strongly encouraged that you read and study the VAE protocol found \
+	<a href='http://www.cdc.gov/nhsn/acute-care-hospital/vae/index.html' target='_blank'>here.</a> \
+	<ul>\
+	<li>The calculator recognizes PEEP values ≤ 5 and corrects entries according to the VAE protocol prior to making a VAC determination.</li>\
+	<li>For periods of time where a patient is on APRV or a related type of mechanical ventilation for a full calendar day, a daily minimum PEEP value should not be entered into the calculator (i.e., do not enter zero)  </li> \
+	<li>The calculator finds multiple VAEs per patient as long as they conform to the 14 day rule.  </li> \
+	</ul></p> \
 	<p>To get started, enter a date below that corresponds to the first day the patient was placed on mechanical  \
 	ventilation during the mechanical ventilation episode of interest. You may type in a date or use the popup \
 	calendar when it appears. You may only enter dates within the past year. If the patient has been on mechanical \
